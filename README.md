@@ -5,7 +5,7 @@
 A Flask REST API for managing customer accounts, built as the DevOps capstone:
 CRUD API, CI with GitHub Actions, Talisman/CORS security, Docker, Kubernetes and a Tekton CD pipeline.
 
-> Replace `<YOUR-GITHUB-USERNAME>` in this badge (and in `tekton/pipelinerun.yaml`) with your GitHub username.
+> Replace `sanvi-a` in this badge (and in `tekton/pipelinerun.yaml`) with your GitHub username.
 > The badge only turns green after the CI workflow has run successfully on GitHub.
 
 ## Endpoints
