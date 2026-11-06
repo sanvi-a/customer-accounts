@@ -1,0 +1,12 @@
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+Flask-Talisman==1.1.0
+Flask-Cors==4.0.1
+gunicorn==22.0.0
+
+# Dev / test tooling
+pynose==1.5.5
+pinocchio==0.5.1
+coverage==7.6.1
+flake8==7.1.1
+pylint==3.2.7

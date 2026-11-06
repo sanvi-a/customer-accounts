@@ -1,0 +1,74 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: cleanup
+spec:
+  workspaces:
+    - name: source
+  steps:
+    - name: remove
+      image: alpine:3
+      env:
+        - name: WORKSPACE_SOURCE_PATH
+          value: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)
+      securityContext:
+        runAsNonRoot: false
+        runAsUser: 0
+      script: |
+        #!/bin/sh
+        set -eu
+        echo "Cleaning up ${WORKSPACE_SOURCE_PATH}"
+        rm -rf "${WORKSPACE_SOURCE_PATH:?}/"* "${WORKSPACE_SOURCE_PATH}"/.[!.]* 2>/dev/null || true
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: flake8
+spec:
+  workspaces:
+    - name: source
+  params:
+    - name: image
+      type: string
+      default: "python:3.11-slim"
+    - name: args
+      type: array
+      default: ["--count"]
+  steps:
+    - name: lint
+      image: $(params.image)
+      workingDir: $(workspaces.source.path)
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          pip install --quiet flake8 && flake8 accounts "$@"
+        - --
+        - $(params.args[*])
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: nose
+spec:
+  workspaces:
+    - name: source
+  params:
+    - name: database_uri
+      type: string
+      default: "sqlite://"
+    - name: args
+      type: string
+      default: "-v"
+  steps:
+    - name: nosetests
+      image: python:3.11-slim
+      workingDir: $(workspaces.source.path)
+      env:
+        - name: DATABASE_URI
+          value: $(params.database_uri)
+      script: |
+        #!/bin/sh
+        set -eu
+        pip install --quiet -r requirements.txt
+        nosetests $(params.args)
